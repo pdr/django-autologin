@@ -1,7 +1,8 @@
 from django.shortcuts import redirect
 from django.utils.cache import add_never_cache_headers
 from django.core.signing import TimestampSigner, BadSignature
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
 
 from . import app_settings
 from .utils import login, strip_token, get_user_salt
@@ -21,7 +22,7 @@ class AutomaticLoginMiddleware(object):
             # The AnonymousUser class has no 'pk' attribute (#18093)
             if getattr(request.user, 'pk', request.user.id) == pk:
                 return r
-
+            User = get_user_model()
             user = User.objects.get(pk=pk)
         except (ValueError, User.DoesNotExist):
             return r
